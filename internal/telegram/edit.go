@@ -48,7 +48,11 @@ func editMenuMarkup(tr *i18n.Translator, lobby db.Lobby) *models.InlineKeyboardM
 		InlineKeyboard: [][]models.InlineKeyboardButton{
 			{
 				{Text: tr.T(i18n.KeyBtnEditName), CallbackData: editFieldData(lobby.ID, editFieldName)},
+				{Text: tr.T(i18n.KeyBtnEditDescription), CallbackData: editFieldData(lobby.ID, editFieldDescription)},
+			},
+			{
 				{Text: tr.T(i18n.KeyBtnEditTime), CallbackData: editFieldData(lobby.ID, editFieldTime)},
+				{Text: tr.T(i18n.KeyBtnEditLink), CallbackData: editFieldData(lobby.ID, editFieldLink)},
 			},
 			{
 				{Text: tr.T(i18n.KeyBtnEditCountry), CallbackData: editFieldData(lobby.ID, editFieldCountry)},
@@ -56,9 +60,6 @@ func editMenuMarkup(tr *i18n.Translator, lobby db.Lobby) *models.InlineKeyboardM
 			},
 			{
 				{Text: tr.T(i18n.KeyBtnEditAddress), CallbackData: editFieldData(lobby.ID, editFieldAddress)},
-				{Text: tr.T(i18n.KeyBtnEditLink), CallbackData: editFieldData(lobby.ID, editFieldLink)},
-			},
-			{
 				{Text: visBtn, CallbackData: fmt.Sprintf("%s:%d", cbEditVis, lobby.ID)},
 			},
 		},
@@ -103,6 +104,8 @@ func (b *Bot) onEditField(ctx context.Context, _ *botClient, update *models.Upda
 	switch field {
 	case editFieldName:
 		prompt = tr.T(i18n.KeyEditAskName)
+	case editFieldDescription:
+		prompt = tr.T(i18n.KeyEditAskDescription)
 	case editFieldCountry:
 		prompt = tr.T(i18n.KeyEditAskCountry)
 	case editFieldCity:
@@ -177,6 +180,12 @@ func (b *Bot) handleEditInput(ctx context.Context, tr *i18n.Translator, msg *mod
 			return
 		}
 		lobby.Name = text
+	case editFieldDescription:
+		if text == "-" {
+			lobby.Description = nil
+		} else {
+			lobby.Description = nullableText(text)
+		}
 	case editFieldCountry:
 		if text == "" {
 			b.send(ctx, msg.Chat.ID, tr.T(i18n.KeyCountryEmpty), nil)
@@ -223,15 +232,16 @@ func (b *Bot) handleEditInput(ctx context.Context, tr *i18n.Translator, msg *mod
 // notifies every approved participant of the change.
 func (b *Bot) applyLobbyUpdate(ctx context.Context, tr *i18n.Translator, loc *time.Location, chatID int64, lobby db.Lobby) {
 	saved, err := b.store.UpdateLobby(ctx, db.UpdateLobbyParams{
-		ID:         lobby.ID,
-		Name:       lobby.Name,
-		Country:    lobby.Country,
-		City:       lobby.City,
-		Address:    lobby.Address,
-		EventTime:  lobby.EventTime,
-		ChatLink:   lobby.ChatLink,
-		Visibility: lobby.Visibility,
-		CreatorID:  lobby.CreatorID,
+		ID:          lobby.ID,
+		Name:        lobby.Name,
+		Description: lobby.Description,
+		Country:     lobby.Country,
+		City:        lobby.City,
+		Address:     lobby.Address,
+		EventTime:   lobby.EventTime,
+		ChatLink:    lobby.ChatLink,
+		Visibility:  lobby.Visibility,
+		CreatorID:   lobby.CreatorID,
 	})
 	if err != nil {
 		b.log.Error("update lobby", zap.Error(err))

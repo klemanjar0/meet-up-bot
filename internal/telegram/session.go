@@ -13,6 +13,7 @@ type step int
 const (
 	stepIdle step = iota
 	stepName
+	stepDescription
 	stepCountry
 	stepCity
 	stepAddress
@@ -26,12 +27,13 @@ const (
 type editField string
 
 const (
-	editFieldName    editField = "name"
-	editFieldCountry editField = "country"
-	editFieldCity    editField = "city"
-	editFieldAddress editField = "address"
-	editFieldTime    editField = "time"
-	editFieldLink    editField = "link"
+	editFieldName        editField = "name"
+	editFieldDescription editField = "description"
+	editFieldCountry     editField = "country"
+	editFieldCity        editField = "city"
+	editFieldAddress     editField = "address"
+	editFieldTime        editField = "time"
+	editFieldLink        editField = "link"
 )
 
 // settingsField names a user setting collected via free-text input.
@@ -58,14 +60,15 @@ type session struct {
 	kind sessionKind
 
 	// create wizard
-	step       step
-	name       string
-	country    string
-	city       string
-	address    string
-	eventTime  time.Time
-	chatLink   string
-	visibility db.LobbyVisibility
+	step        step
+	name        string
+	description string
+	country     string
+	city        string
+	address     string
+	eventTime   time.Time
+	chatLink    string
+	visibility  db.LobbyVisibility
 
 	// edit flow
 	editLobbyID int64

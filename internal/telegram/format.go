@@ -133,7 +133,11 @@ func formatLobby(tr *i18n.Translator, loc *time.Location, l db.Lobby, approvedCo
 	}
 
 	when := l.EventTime.Time.In(loc).Format(displayTimeTZ)
-	s := fmt.Sprintf("<b>%s</b>\n🕒 %s", htmlEscape(l.Name), htmlEscape(when))
+	s := fmt.Sprintf("<b>%s</b>", htmlEscape(l.Name))
+	if l.Description != nil && *l.Description != "" {
+		s += "\n<i>" + htmlEscape(*l.Description) + "</i>"
+	}
+	s += "\n🕒 " + htmlEscape(when)
 
 	if place := locationLine(l); place != "" {
 		s += "\n📍 " + htmlEscape(place)

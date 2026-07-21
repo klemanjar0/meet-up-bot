@@ -1,6 +1,6 @@
 -- name: CreateLobby :one
-INSERT INTO lobbies (creator_id, name, country, city, address, event_time, chat_link, visibility)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO lobbies (creator_id, name, description, country, city, address, event_time, chat_link, visibility)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 
 -- name: GetLobby :one
@@ -17,15 +17,16 @@ WHERE id = $1
 
 -- name: UpdateLobby :one
 UPDATE lobbies
-SET name       = $2,
-    country    = $3,
-    city       = $4,
-    address    = $5,
-    event_time = $6,
-    chat_link  = $7,
-    visibility = $8
+SET name        = $2,
+    description  = $3,
+    country     = $4,
+    city        = $5,
+    address     = $6,
+    event_time  = $7,
+    chat_link   = $8,
+    visibility  = $9
 WHERE id = $1
-  AND creator_id = $9
+  AND creator_id = $10
 RETURNING *;
 
 -- name: ListLobbiesFiltered :many

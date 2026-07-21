@@ -61,6 +61,13 @@ func (b *Bot) onText(ctx context.Context, _ *botClient, update *models.Update) {
 			return
 		}
 		s.name = text
+		s.step = stepDescription
+		b.send(ctx, msg.Chat.ID, tr.T(i18n.KeyAskDescription), nil)
+
+	case stepDescription:
+		if text != "-" && text != "" {
+			s.description = text
+		}
 		s.step = stepCountry
 		b.send(ctx, msg.Chat.ID, tr.T(i18n.KeyAskCountry), nil)
 
@@ -147,14 +154,15 @@ func (b *Bot) onVisibility(ctx context.Context, _ *botClient, update *models.Upd
 	b.answer(ctx, q.ID, "")
 
 	lobby, err := b.store.CreateLobby(ctx, db.CreateLobbyParams{
-		CreatorID:  userID,
-		Name:       s.name,
-		Country:    s.country,
-		City:       s.city,
-		Address:    nullableText(s.address),
-		EventTime:  toTimestamptz(s.eventTime),
-		ChatLink:   nullableText(s.chatLink),
-		Visibility: s.visibility,
+		CreatorID:   userID,
+		Name:        s.name,
+		Description: nullableText(s.description),
+		Country:     s.country,
+		City:        s.city,
+		Address:     nullableText(s.address),
+		EventTime:   toTimestamptz(s.eventTime),
+		ChatLink:    nullableText(s.chatLink),
+		Visibility:  s.visibility,
 	})
 	if err != nil {
 		b.log.Error("create lobby", zap.Error(err))

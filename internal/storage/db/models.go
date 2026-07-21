@@ -98,16 +98,17 @@ func (ns NullMembershipStatus) Value() (driver.Value, error) {
 }
 
 type Lobby struct {
-	ID         int64              `json:"id"`
-	CreatorID  int64              `json:"creator_id"`
-	Name       string             `json:"name"`
-	EventTime  pgtype.Timestamptz `json:"event_time"`
-	ChatLink   *string            `json:"chat_link"`
-	Visibility LobbyVisibility    `json:"visibility"`
-	CreatedAt  pgtype.Timestamptz `json:"created_at"`
-	Country    string             `json:"country"`
-	City       string             `json:"city"`
-	Address    *string            `json:"address"`
+	ID          int64              `json:"id"`
+	CreatorID   int64              `json:"creator_id"`
+	Name        string             `json:"name"`
+	EventTime   pgtype.Timestamptz `json:"event_time"`
+	ChatLink    *string            `json:"chat_link"`
+	Visibility  LobbyVisibility    `json:"visibility"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	Country     string             `json:"country"`
+	City        string             `json:"city"`
+	Address     *string            `json:"address"`
+	Description *string            `json:"description"`
 }
 
 type LobbyMember struct {

@@ -44,6 +44,7 @@ const (
 	// Create wizard.
 	KeyCreateStart
 	KeyNameEmpty
+	KeyAskDescription
 	KeyAskCountry
 	KeyCountryEmpty
 	KeyAskCity
@@ -104,6 +105,7 @@ const (
 	// Edit lobby.
 	KeyEditMenu
 	KeyBtnEditName
+	KeyBtnEditDescription
 	KeyBtnEditCountry
 	KeyBtnEditCity
 	KeyBtnEditAddress
@@ -112,6 +114,7 @@ const (
 	KeyBtnMakePublic
 	KeyBtnMakePrivate
 	KeyEditAskName
+	KeyEditAskDescription
 	KeyEditAskCountry
 	KeyEditAskCity
 	KeyEditAskAddress
@@ -200,6 +203,7 @@ var messages = map[Key]entry{
 
 	KeyCreateStart:        {en: "Let's create a lobby! 🎉\n\nWhat's the <b>name</b> of your event?\n\n(Send /cancel any time to abort.)", ru: "Создаём лобби! 🎉\n\nКак называется ваше мероприятие? (<b>название</b>)\n\n(Отправьте /cancel, чтобы отменить.)"},
 	KeyNameEmpty:          {en: "The name can't be empty. What's the event called?", ru: "Название не может быть пустым. Как называется мероприятие?"},
+	KeyAskDescription:     {en: "Add a <b>description</b>, or send <code>-</code> to skip.", ru: "Добавьте <b>описание</b> или отправьте <code>-</code>, чтобы пропустить."},
 	KeyAskCountry:         {en: "Which <b>country</b> is it in?", ru: "В какой <b>стране</b> оно пройдёт?"},
 	KeyCountryEmpty:       {en: "Please tell me the country.", ru: "Пожалуйста, укажите страну."},
 	KeyAskCity:            {en: "Which <b>city</b>?", ru: "В каком <b>городе</b>?"},
@@ -255,24 +259,26 @@ var messages = map[Key]entry{
 	KeyBannedEdit:     {en: "🔨 Banned from <b>%s</b>.", ru: "🔨 Забанен в <b>%s</b>."},
 	KeyBannedMsg:      {en: "🔨 You were banned from <b>%s</b> and can no longer join it.", ru: "🔨 Вас забанили в <b>%s</b>, вы больше не сможете присоединиться."},
 
-	KeyEditMenu:       {en: "What would you like to change in <b>%s</b>?", ru: "Что изменить в <b>%s</b>?"},
-	KeyBtnEditName:    {en: "✏️ Name", ru: "✏️ Название"},
-	KeyBtnEditCountry: {en: "🌎 Country", ru: "🌎 Страна"},
-	KeyBtnEditCity:    {en: "🏙 City", ru: "🏙 Город"},
-	KeyBtnEditAddress: {en: "🏠 Address", ru: "🏠 Адрес"},
-	KeyBtnEditTime:    {en: "🕒 Time", ru: "🕒 Время"},
-	KeyBtnEditLink:    {en: "💬 Chat link", ru: "💬 Ссылка на чат"},
-	KeyBtnMakePublic:  {en: "🌍 Make public", ru: "🌍 Сделать публичным"},
-	KeyBtnMakePrivate: {en: "🔒 Make private", ru: "🔒 Сделать приватным"},
-	KeyEditAskName:    {en: "Send the new <b>name</b>.", ru: "Отправьте новое <b>название</b>."},
-	KeyEditAskCountry: {en: "Send the new <b>country</b>.", ru: "Отправьте новую <b>страну</b>."},
-	KeyEditAskCity:    {en: "Send the new <b>city</b>.", ru: "Отправьте новый <b>город</b>."},
-	KeyEditAskAddress: {en: "Send the new <b>address</b>, or <code>-</code> to remove it.", ru: "Отправьте новый <b>адрес</b> или <code>-</code>, чтобы удалить."},
-	KeyEditAskTime:    {en: "Send the new <b>time</b> as <code>%s</code> (your timezone: %s).", ru: "Отправьте новое <b>время</b> в формате <code>%s</code> (ваш часовой пояс: %s)."},
-	KeyEditAskLink:    {en: "Send the new <b>chat link</b>, or <code>-</code> to remove it.", ru: "Отправьте новую <b>ссылку на чат</b> или <code>-</code>, чтобы удалить."},
-	KeyEditSaved:      {en: "✅ Updated <b>%s</b>.", ru: "✅ Лобби <b>%s</b> обновлено."},
-	KeyEditNotify:     {en: "🔔 The lobby <b>%s</b> you joined was updated:", ru: "🔔 Лобби <b>%s</b>, к которому вы присоединились, обновлено:"},
-	KeyEditExpired:    {en: "This edit session expired. Open /mylobbies again.", ru: "Сессия редактирования истекла. Откройте /mylobbies снова."},
+	KeyEditMenu:           {en: "What would you like to change in <b>%s</b>?", ru: "Что изменить в <b>%s</b>?"},
+	KeyBtnEditName:        {en: "✏️ Name", ru: "✏️ Название"},
+	KeyBtnEditDescription: {en: "📝 Description", ru: "📝 Описание"},
+	KeyBtnEditCountry:     {en: "🌎 Country", ru: "🌎 Страна"},
+	KeyBtnEditCity:        {en: "🏙 City", ru: "🏙 Город"},
+	KeyBtnEditAddress:     {en: "🏠 Address", ru: "🏠 Адрес"},
+	KeyBtnEditTime:        {en: "🕒 Time", ru: "🕒 Время"},
+	KeyBtnEditLink:        {en: "💬 Chat link", ru: "💬 Ссылка на чат"},
+	KeyBtnMakePublic:      {en: "🌍 Make public", ru: "🌍 Сделать публичным"},
+	KeyBtnMakePrivate:     {en: "🔒 Make private", ru: "🔒 Сделать приватным"},
+	KeyEditAskName:        {en: "Send the new <b>name</b>.", ru: "Отправьте новое <b>название</b>."},
+	KeyEditAskDescription: {en: "Send the new <b>description</b>, or <code>-</code> to remove it.", ru: "Отправьте новое <b>описание</b> или <code>-</code>, чтобы удалить."},
+	KeyEditAskCountry:     {en: "Send the new <b>country</b>.", ru: "Отправьте новую <b>страну</b>."},
+	KeyEditAskCity:        {en: "Send the new <b>city</b>.", ru: "Отправьте новый <b>город</b>."},
+	KeyEditAskAddress:     {en: "Send the new <b>address</b>, or <code>-</code> to remove it.", ru: "Отправьте новый <b>адрес</b> или <code>-</code>, чтобы удалить."},
+	KeyEditAskTime:        {en: "Send the new <b>time</b> as <code>%s</code> (your timezone: %s).", ru: "Отправьте новое <b>время</b> в формате <code>%s</code> (ваш часовой пояс: %s)."},
+	KeyEditAskLink:        {en: "Send the new <b>chat link</b>, or <code>-</code> to remove it.", ru: "Отправьте новую <b>ссылку на чат</b> или <code>-</code>, чтобы удалить."},
+	KeyEditSaved:          {en: "✅ Updated <b>%s</b>.", ru: "✅ Лобби <b>%s</b> обновлено."},
+	KeyEditNotify:         {en: "🔔 The lobby <b>%s</b> you joined was updated:", ru: "🔔 Лобби <b>%s</b>, к которому вы присоединились, обновлено:"},
+	KeyEditExpired:        {en: "This edit session expired. Open /mylobbies again.", ru: "Сессия редактирования истекла. Откройте /mylobbies снова."},
 
 	KeySettingsMenu:     {en: "⚙️ <b>Settings</b>\n\n🌐 Language: %s\n🕒 Timezone: %s\n🏙 City: %s\n📅 Time filter: %s\n\nWhat would you like to change?", ru: "⚙️ <b>Настройки</b>\n\n🌐 Язык: %s\n🕒 Часовой пояс: %s\n🏙 Город: %s\n📅 Фильтр по времени: %s\n\nЧто изменить?"},
 	KeyBtnSetLang:       {en: "🌐 Language", ru: "🌐 Язык"},
