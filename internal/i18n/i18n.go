@@ -179,6 +179,10 @@ const (
 	KeyDeletedNotify
 	KeyLeftToast
 	KeyLeftEdit
+
+	// Invite links.
+	KeyBtnInvite
+	KeyInviteText
 )
 
 type entry struct{ en, ru string }
@@ -330,6 +334,9 @@ var messages = map[Key]entry{
 	KeyDeletedNotify:    {en: "🗑 The lobby <b>%s</b> you joined was deleted by the admin.", ru: "🗑 Лобби <b>%s</b>, к которому вы присоединились, удалено администратором."},
 	KeyLeftToast:        {en: "You left 🚪", ru: "Вы вышли 🚪"},
 	KeyLeftEdit:         {en: "🚪 You left <b>%s</b>.", ru: "🚪 Вы покинули <b>%s</b>."},
+
+	KeyBtnInvite:  {en: "🔗 Invite link", ru: "🔗 Ссылка-приглашение"},
+	KeyInviteText: {en: "🔗 Share this link to invite people to <b>%s</b>:\n%s", ru: "🔗 Поделитесь этой ссылкой, чтобы пригласить в <b>%s</b>:\n%s"},
 }
 
 // Translator renders messages in a fixed locale.

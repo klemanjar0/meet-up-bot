@@ -27,6 +27,7 @@ type Bot struct {
 	store    *storage.Store
 	log      *zap.Logger
 	sessions *sessions
+	username string // the bot's @username, used to build invite deep links
 }
 
 // New constructs the bot, registers all handlers, and returns it ready to Start.
@@ -54,7 +55,9 @@ func New(token string, store *storage.Store, log *zap.Logger) (*Bot, error) {
 }
 
 func (b *Bot) registerHandlers() {
-	b.api.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, b.onStart)
+	// "start" as a command match so it also catches deep links like
+	// "/start join_42" from invite URLs.
+	b.api.RegisterHandler(bot.HandlerTypeMessageText, "start", bot.MatchTypeCommandStartOnly, b.onStart)
 	b.api.RegisterHandler(bot.HandlerTypeMessageText, "/help", bot.MatchTypeExact, b.onStart)
 	b.api.RegisterHandler(bot.HandlerTypeMessageText, "/create", bot.MatchTypeExact, b.onCreate)
 	b.api.RegisterHandler(bot.HandlerTypeMessageText, "/lobbies", bot.MatchTypeExact, b.onListLobbies)
@@ -82,6 +85,7 @@ func (b *Bot) registerHandlers() {
 	b.api.RegisterHandler(bot.HandlerTypeCallbackQueryData, cbDeleteYes+":", bot.MatchTypePrefix, b.onDeleteConfirm)
 	b.api.RegisterHandler(bot.HandlerTypeCallbackQueryData, cbLeave+":", bot.MatchTypePrefix, b.onLeaveLobby)
 	b.api.RegisterHandler(bot.HandlerTypeCallbackQueryData, cbDismiss+":", bot.MatchTypePrefix, b.onDismiss)
+	b.api.RegisterHandler(bot.HandlerTypeCallbackQueryData, cbInvite+":", bot.MatchTypePrefix, b.onInvite)
 }
 
 // memberStatus returns the user's membership status for a lobby and whether a
@@ -123,6 +127,13 @@ func (b *Bot) viewer(ctx context.Context, userID int64) (*i18n.Translator, *time
 
 // Start runs the long-polling loop until ctx is cancelled.
 func (b *Bot) Start(ctx context.Context) {
+	// Resolve our own @username so invite deep links can be built.
+	if me, err := b.api.GetMe(ctx); err == nil {
+		b.username = me.Username
+		b.log.Info("telegram bot identified", zap.String("username", me.Username))
+	} else {
+		b.log.Warn("could not resolve bot username; invite links unavailable", zap.Error(err))
+	}
 	b.log.Info("starting telegram long polling")
 	b.api.Start(ctx)
 }

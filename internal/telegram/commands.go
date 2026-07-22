@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/go-telegram/bot/models"
 	"github.com/jackc/pgx/v5"
@@ -34,6 +35,15 @@ func (b *Bot) onStart(ctx context.Context, _ *botClient, update *models.Update) 
 		b.log.Error("ensure user", zap.Error(err))
 	}
 	tr := i18n.For(i18n.Parse(user.Locale))
+
+	// A deep link ("/start join_42") carries a payload after the command; route
+	// it into the join flow instead of showing help.
+	if _, payload, found := strings.Cut(strings.TrimSpace(msg.Text), " "); found {
+		if lobbyID, ok := parseJoinPayload(strings.TrimSpace(payload)); ok {
+			b.startJoin(ctx, tr, msg, lobbyID)
+			return
+		}
+	}
 	b.send(ctx, msg.Chat.ID, tr.T(i18n.KeyHelp), nil)
 }
 
@@ -134,10 +144,13 @@ func (b *Bot) onDetails(ctx context.Context, _ *botClient, update *models.Update
 	count, _ := b.store.CountApprovedMembers(ctx, lobbyID)
 	text := formatLobby(tr, loc, lobby, count, true) + "\n" + roleLabel(tr, lobby, uid)
 
+	inviteBtn := models.InlineKeyboardButton{Text: tr.T(i18n.KeyBtnInvite), CallbackData: fmt.Sprintf("%s:%d", cbInvite, lobby.ID)}
+
 	if !isAdmin {
-		// Members get a Leave button.
+		// Members get Invite and Leave buttons.
 		markup := &models.InlineKeyboardMarkup{
 			InlineKeyboard: [][]models.InlineKeyboardButton{{
+				inviteBtn,
 				{Text: tr.T(i18n.KeyBtnLeave), CallbackData: fmt.Sprintf("%s:%d", cbLeave, lobby.ID)},
 			}},
 		}
@@ -152,6 +165,7 @@ func (b *Bot) onDetails(ctx context.Context, _ *botClient, update *models.Update
 				{Text: tr.T(i18n.KeyBtnEdit), CallbackData: fmt.Sprintf("%s:%d", cbEdit, lobby.ID)},
 			},
 			{
+				inviteBtn,
 				{Text: tr.T(i18n.KeyBtnDeleteLobby), CallbackData: fmt.Sprintf("%s:%d", cbDelete, lobby.ID)},
 			},
 		},

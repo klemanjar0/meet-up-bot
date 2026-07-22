@@ -100,15 +100,7 @@ func (b *Bot) joinPrivate(ctx context.Context, tr *i18n.Translator, q *models.Ca
 	b.send(ctx, q.From.ID, tr.T(i18n.KeyRequestSentMsg, htmlEscape(lobby.Name)), nil)
 
 	// Notify the creator (in their own locale) with approve/reject buttons.
-	adminTr := b.tr(ctx, lobby.CreatorID)
-	who := describeUser(userFromModel(q.From))
-	markup := &models.InlineKeyboardMarkup{
-		InlineKeyboard: [][]models.InlineKeyboardButton{{
-			{Text: adminTr.T(i18n.KeyBtnApprove), CallbackData: fmt.Sprintf("%s:%d:%d", cbApprove, lobby.ID, q.From.ID)},
-			{Text: adminTr.T(i18n.KeyBtnReject), CallbackData: fmt.Sprintf("%s:%d:%d", cbReject, lobby.ID, q.From.ID)},
-		}},
-	}
-	b.send(ctx, lobby.CreatorID, adminTr.T(i18n.KeyAdminNewRequest, who, htmlEscape(lobby.Name)), markup)
+	b.notifyRequestToAdmin(ctx, lobby, q.From)
 }
 
 // onApprove and onReject are the admin decisions on a pending request.

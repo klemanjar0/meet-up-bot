@@ -33,7 +33,12 @@ const (
 	cbDeleteYes  = "delyes"
 	cbLeave      = "leave"
 	cbDismiss    = "dismiss"
+	cbInvite     = "invite"
 )
+
+// startPayloadJoin is the deep-link /start payload prefix for joining a lobby:
+// t.me/<bot>?start=join_<lobbyID>.
+const startPayloadJoin = "join_"
 
 // timeFilter values stored in users.time_filter.
 const (

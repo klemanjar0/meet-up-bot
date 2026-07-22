@@ -53,6 +53,11 @@ of the change.
 **`/lobbies`** lists upcoming lobbies soonest-first, filtered by your city and
 time-window settings, paginated 10 per page with ⬅️/➡️ navigation.
 
+**Invite links** — from a lobby's Details, an admin or member can generate a
+`🔗 Invite link` (`https://t.me/<bot>?start=join_<id>`). Tapping it opens the
+bot and joins the tapper (public) or files a join request (private), exactly
+like the Join button.
+
 ## Quick start (full Docker stack)
 
 1. `cp .env.example .env` and set `TELEGRAM_BOT_TOKEN` (from [@BotFather](https://t.me/BotFather)).
